@@ -20,15 +20,23 @@ type CacheShard struct {
 	lruList *LinkedList
 }
 
+type ShardInfo struct {
+	Index int `json:"Index"`
+	Size  int `json:"Size"`
+}
+
 type ICacheShard interface {
-	Info()
+	Info() ShardInfo
 	Print()
 	Get(key string) (*ShardItem, error)
 	Set(key string, value interface{}) (*ShardItem, error)
 }
 
-func (cs *CacheShard) Info() {
-	fmt.Printf("Shard index: %d, size: %d\n", cs.index, cs.lruList.size)
+func (cs *CacheShard) Info() ShardInfo {
+	return ShardInfo{
+		Size:  cs.lruList.size,
+		Index: cs.index,
+	}
 }
 
 func (cs *CacheShard) Print() {

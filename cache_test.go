@@ -1,6 +1,7 @@
 package lru
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -17,7 +18,8 @@ func TestGetSet(t *testing.T) {
 		keys = uuid.NewString()
 		values = uuid.NewString()
 
-		_, err := cache.Set(keys, values)
+		value := Item{Key: keys, Value: values}
+		_, err := cache.Set(keys, value)
 		if err != nil {
 			fmt.Printf("Failed to set (K, V): (%s, %s) due to (error: %s)\n", keys, values, err)
 		}
@@ -26,8 +28,12 @@ func TestGetSet(t *testing.T) {
 		if err != nil {
 			fmt.Printf("Failed to get (K, V): (%s, %s) due to (error: %s)\n", keys, values, err)
 		} else {
-			fmt.Printf("%d - (K, V) -> (%s, %s)\n", i, item.Key, item.Value)
+			b, err := json.MarshalIndent(item, "", "  ")
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			fmt.Println(string(b))
 		}
 	}
-
 }

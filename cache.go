@@ -3,7 +3,7 @@ package lru
 import "github.com/zeebo/xxh3"
 
 type Item struct {
-	Key   string
+	Key   string `json:"Key"`
 	Value interface{}
 }
 
@@ -12,7 +12,7 @@ type ICache interface {
 	Set(key string, value interface{}) (*Item, error)
 	GetShardIndex(key string) int
 	Print()
-	Info()
+	Info() []ShardInfo
 }
 
 type Cache struct {
@@ -20,10 +20,13 @@ type Cache struct {
 	shards      []*CacheShard
 }
 
-func (cache *Cache) Info() {
+func (cache *Cache) Info() []ShardInfo {
+	shardInfo := []ShardInfo{}
 	for i := 0; i < int(cache.cacheConfig.NumberOfShards); i++ {
-		cache.shards[i].Info()
+		shardInfo = append(shardInfo, cache.shards[i].Info())
 	}
+
+	return shardInfo
 }
 
 func (cache *Cache) Print() {
