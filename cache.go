@@ -12,22 +12,28 @@ type ICache interface {
 	Set(key string, value interface{}) (*Item, error)
 	GetShardIndex(key string) int
 	Print()
+	Info()
 }
 
 type Cache struct {
-	numberOfShards uint64
-	shardCapacity  int
-	shards         []*CacheShard
+	cacheConfig CacheConfig
+	shards      []*CacheShard
+}
+
+func (cache *Cache) Info() {
+	for i := 0; i < int(cache.cacheConfig.NumberOfShards); i++ {
+		cache.shards[i].Info()
+	}
 }
 
 func (cache *Cache) Print() {
-	for i := 0; i < int(cache.numberOfShards); i++ {
+	for i := 0; i < int(cache.cacheConfig.NumberOfShards); i++ {
 		cache.shards[i].Print()
 	}
 }
 
 func (cache *Cache) GetShardIndex(key string) int {
-	return int(xxh3.HashString(key) % cache.numberOfShards)
+	return int(xxh3.HashString(key) % cache.cacheConfig.NumberOfShards)
 }
 
 func (cache *Cache) Get(key string) (*Item, error) {
@@ -54,14 +60,13 @@ func (cache *Cache) Set(key string, value interface{}) (*Item, error) {
 	}, nil
 }
 
-func NewCache(numberOfShards uint64, shardCapacity int) *Cache {
-	shards := make([]*CacheShard, int(numberOfShards))
-	for i := 0; i < int(numberOfShards); i++ {
-		shards[i] = NewCacheShard(i, shardCapacity)
+func NewCache(cacheConfig CacheConfig) *Cache {
+	shards := make([]*CacheShard, int(cacheConfig.NumberOfShards))
+	for i := 0; i < int(cacheConfig.NumberOfShards); i++ {
+		shards[i] = NewCacheShard(i, cacheConfig.ShardCapacity)
 	}
 	return &Cache{
-		numberOfShards: numberOfShards,
-		shardCapacity:  shardCapacity,
-		shards:         shards,
+		cacheConfig: cacheConfig,
+		shards:      shards,
 	}
 }

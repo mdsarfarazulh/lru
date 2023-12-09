@@ -21,9 +21,14 @@ type CacheShard struct {
 }
 
 type ICacheShard interface {
+	Info()
 	Print()
 	Get(key string) (*ShardItem, error)
 	Set(key string, value interface{}) (*ShardItem, error)
+}
+
+func (cs *CacheShard) Info() {
+	fmt.Printf("Shard index: %d, size: %d\n", cs.index, cs.lruList.size)
 }
 
 func (cs *CacheShard) Print() {

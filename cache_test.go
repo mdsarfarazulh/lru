@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetSet(t *testing.T) {
-	cache := NewCache(10, 200)
+	cache := NewCache(NewCacheConfig(10, 20000))
 	const count int = 10000 //00000
 	var keys string
 	var values string
